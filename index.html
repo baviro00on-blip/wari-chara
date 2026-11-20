@@ -870,7 +870,7 @@
         // アプリ状態管理
         // ==========================================
         let clearedFlags = new Array(TOTAL_QUESTIONS).fill(false);
-        let ownedCards = BAKE_CARDS.map(c => c.id);
+        let ownedCards = [];
         let currentGlobalQIdx = 0;
         let isSoundEnabled = true;
         let isProcessingAnswer = false;
@@ -1005,8 +1005,12 @@
 
             if (Array.isArray(data.ownedCards)) {
                 const loadedCards = data.ownedCards.filter(id => typeof id === 'string');
-                const mergedSet = new Set([...BAKE_CARDS.map(c => c.id), ...loadedCards, ...ownedCards]);
-                ownedCards = Array.from(mergedSet);
+                if (hasLocalMutation && !forceOverwrite) {
+                    const mergedSet = new Set([...loadedCards, ...ownedCards]);
+                    ownedCards = Array.from(mergedSet);
+                } else {
+                    ownedCards = Array.from(new Set(loadedCards));
+                }
             }
 
             if (!userNavigatedInSession && (!hasLocalMutation || incomingUpdatedAt >= lastSavedTimestamp)) {
